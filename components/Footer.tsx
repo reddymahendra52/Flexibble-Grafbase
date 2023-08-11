@@ -1,8 +1,23 @@
+"use client";
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 
 import { footerLinks } from "@/constants";
+import { ProjectInterface } from "@/commons.types";
+import { fetchAllProjects } from "@/lib/actions";
+
+type ProjectSearch = {
+  projectSearch: {
+    edges: { node: ProjectInterface }[];
+    pageInfo: {
+      hasPreviousPage: boolean;
+      hasNextPage: boolean;
+      startCursor: string;
+      endCursor: string;
+    };
+  };
+};
 
 type ColumnProps = {
   title: string;
@@ -22,7 +37,12 @@ const FooterColumn = ({ title, links }: ColumnProps) => (
   </div>
 );
 
-const Footer = () => {
+const Footer = async () => {
+  const data = (await fetchAllProjects()) as ProjectSearch;
+
+  const projectsToDisplay = data?.projectSearch?.edges || [];
+  let count = projectsToDisplay.length;
+
   return (
     <footer className="flexStart footer">
       <div className="flex flex-col gap-12 w-full">
@@ -72,7 +92,7 @@ const Footer = () => {
       <div className="flexBetween footer_copyright">
         <p>@ 2023 Flexibble. All rights reserved</p>
         <p className="text-gray">
-          <span className="text-black font-semibold">10,214</span> projects
+          <span className="text-black font-semibold">{count}</span> projects
           submitted
         </p>
       </div>
